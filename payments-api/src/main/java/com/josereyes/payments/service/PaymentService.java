@@ -8,8 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.josereyes.payments.dto.CreatePaymentRequest;
 import com.josereyes.payments.dto.PaymentResponse;
+import com.josereyes.payments.dto.UpdatePaymentStatusRequest;
 import com.josereyes.payments.entity.Payment;
 import com.josereyes.payments.entity.PaymentStatus;
+import com.josereyes.payments.exception.InvalidPaymentStatusTransitionException;
 import com.josereyes.payments.exception.PaymentNotFoundException;
 import com.josereyes.payments.repository.PaymentRepository;
 
@@ -50,5 +52,25 @@ public class PaymentService{
          payment.getAmount(), payment.getCurrency(), payment.getDescription(), 
          payment.getCustomerEmail(), payment.getStatus(), payment.getCreatedAt()
         );
+    }
+
+    @Transactional
+    public PaymentResponse updatePaymentStatus(String id, UpdatePaymentStatusRequest request){
+        Payment payment = paymentRepository.findById(id).orElseThrow(() -> new PaymentNotFoundException(id));
+
+        PaymentStatus currentStatus = payment.getStatus();
+        PaymentStatus requestedStatus = request.status();
+
+        if (currentStatus != PaymentStatus.PENDING || requestedStatus == null || requestedStatus == PaymentStatus.PENDING){
+            throw new InvalidPaymentStatusTransitionException(currentStatus,requestedStatus);
+        }
+
+        payment.setStatus(requestedStatus);
+
+        Payment savedPayment = paymentRepository.save(payment);
+
+        return new PaymentResponse(savedPayment.getId(), savedPayment.getMerchantId(),
+         savedPayment.getAmount(), savedPayment.getCurrency(), savedPayment.getDescription(),
+          savedPayment.getCustomerEmail(), savedPayment.getStatus(), savedPayment.getCreatedAt());
     }
 }
