@@ -1,6 +1,7 @@
 package com.josereyes.payments.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -72,5 +73,21 @@ public class PaymentService{
         return new PaymentResponse(savedPayment.getId(), savedPayment.getMerchantId(),
          savedPayment.getAmount(), savedPayment.getCurrency(), savedPayment.getDescription(),
           savedPayment.getCustomerEmail(), savedPayment.getStatus(), savedPayment.getCreatedAt());
+    }
+
+    @Transactional(readOnly = true)
+    public List<PaymentResponse> getMerchantPayments(String merchantId, PaymentStatus status){
+
+        List<Payment> payments;
+
+        if (status == null){
+            payments = paymentRepository.findByMerchantId(merchantId);
+        }else{
+            payments = paymentRepository.findByMerchantIdAndStatus(merchantId, status);
+        }
+
+        return payments.stream().map(payment -> new PaymentResponse(payment.getId(), payment.getMerchantId(),
+         payment.getAmount(), payment.getCurrency(), payment.getDescription(), payment.getCustomerEmail(),
+          payment.getStatus(), payment.getCreatedAt())).toList();
     }
 }
