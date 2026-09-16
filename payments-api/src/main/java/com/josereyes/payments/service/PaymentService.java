@@ -10,6 +10,7 @@ import com.josereyes.payments.dto.CreatePaymentRequest;
 import com.josereyes.payments.dto.PaymentResponse;
 import com.josereyes.payments.entity.Payment;
 import com.josereyes.payments.entity.PaymentStatus;
+import com.josereyes.payments.exception.PaymentNotFoundException;
 import com.josereyes.payments.repository.PaymentRepository;
 
 @Service                                                            //permite que spring gestione la clase y le proporcione el repositorio a traves del constructior
@@ -38,6 +39,16 @@ public class PaymentService{
         return new PaymentResponse(savedPayment.getId(), savedPayment.getMerchantId(),
          savedPayment.getAmount(), savedPayment.getCurrency(), savedPayment.getDescription(), 
          savedPayment.getCustomerEmail(), savedPayment.getStatus(), savedPayment.getCreatedAt()
+        );
+    }
+
+    @Transactional(readOnly = true)                         //readOnly indica que la operacion es de consulta
+    public PaymentResponse getPaymentById(String id){
+        Payment payment = paymentRepository.findById(id).orElseThrow(() -> new PaymentNotFoundException(id));
+
+        return new PaymentResponse(payment.getId(), payment.getMerchantId(),
+         payment.getAmount(), payment.getCurrency(), payment.getDescription(), 
+         payment.getCustomerEmail(), payment.getStatus(), payment.getCreatedAt()
         );
     }
 }

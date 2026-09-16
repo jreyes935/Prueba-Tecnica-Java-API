@@ -3,6 +3,8 @@ package com.josereyes.payments.controller;
 import java.net.URI;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,5 +33,12 @@ public class PaymentController {
         URI location = URI.create("/api/payments/" + response.id());
 
         return ResponseEntity.created(location).body(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PaymentResponse> getPaymentById(@PathVariable String id){         //@PathVariable toma la id de la direccion solicitada, si no existe, envia error 404
+        PaymentResponse response = paymentService.getPaymentById(id);
+
+        return ResponseEntity.ok(response);
     }
 }

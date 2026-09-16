@@ -17,7 +17,7 @@ public record CreatePaymentRequest(
         inclusive = false,
         message = "amount debe ser mayor a 0"
     )
-    BigDecimal amount,
+    BigDecimal amount,                          //Si menor o igual a 0, envia error 400
 
     @NotBlank(message = "currency es requerido")
     String currency,
