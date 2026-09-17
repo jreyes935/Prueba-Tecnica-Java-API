@@ -3,6 +3,7 @@ package com.josereyes.payments.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -15,6 +16,7 @@ public class Payment {
     @Id                                 //Identifica la clave primaria de cada pago
     private String id;
     private String merchantId;
+    @Column(nullable = false, precision = 19, scale = 2)        //position=19 ndica cantidad de digitos y scale=2 indica cuantos puestos decimales puede tener
     private BigDecimal amount;
     private String currency;
     private String description;

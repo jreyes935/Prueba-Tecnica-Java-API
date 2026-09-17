@@ -3,6 +3,7 @@ package com.josereyes.payments.dto;
 import java.math.BigDecimal;
 
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,6 +17,11 @@ public record CreatePaymentRequest(
         value = "0",
         inclusive = false,
         message = "amount debe ser mayor a 0"
+    )
+    @Digits(
+        integer = 17,
+        fraction = 2,
+        message = "amount accepta hasta 17 digitos y 2 decimales"
     )
     BigDecimal amount,                          //Si menor o igual a 0, envia error 400
 
