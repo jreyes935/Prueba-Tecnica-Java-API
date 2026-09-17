@@ -1,5 +1,6 @@
 package com.josereyes.payments.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.josereyes.payments.dto.CreatePaymentRequest;
+import com.josereyes.payments.dto.MerchantSummaryResponse;
 import com.josereyes.payments.dto.PaymentResponse;
 import com.josereyes.payments.dto.UpdatePaymentStatusRequest;
 import com.josereyes.payments.entity.Payment;
@@ -89,5 +91,37 @@ public class PaymentService{
         return payments.stream().map(payment -> new PaymentResponse(payment.getId(), payment.getMerchantId(),
          payment.getAmount(), payment.getCurrency(), payment.getDescription(), payment.getCustomerEmail(),
           payment.getStatus(), payment.getCreatedAt())).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public MerchantSummaryResponse getMerchantSummary(String merchantId){
+        List<Payment> payments = paymentRepository.findByMerchantId(merchantId);
+
+        long approvedPayments = 0;
+        long declinedPayments = 0;
+        long cancelledPayments = 0;
+        BigDecimal totalApprovedAmount = BigDecimal.ZERO;
+
+        for (int i = 0; i < payments.size(); i++){
+            Payment payment = payments.get(i);
+
+            switch(payment.getStatus()){
+                case APPROVED:
+                    approvedPayments++;
+                    totalApprovedAmount = totalApprovedAmount.add(payment.getAmount());
+                    break;
+                case DECLINED:
+                    declinedPayments++;
+                    break;
+                case CANCELLED:
+                    cancelledPayments++;
+                    break;
+                case PENDING:
+                    break;
+            }
+        }
+
+        return new MerchantSummaryResponse(merchantId, payments.size(), approvedPayments,
+         declinedPayments, cancelledPayments, totalApprovedAmount);
     }
 }

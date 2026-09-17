@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.josereyes.payments.dto.MerchantSummaryResponse;
 import com.josereyes.payments.dto.PaymentResponse;
 import com.josereyes.payments.entity.PaymentStatus;
 import com.josereyes.payments.service.PaymentService;
@@ -27,5 +28,12 @@ public class MerchantController {
         List<PaymentResponse> payments = paymentService.getMerchantPayments(merchantId, status);
 
         return ResponseEntity.ok(payments);
+    }
+
+    @GetMapping("/{merchantId}/summary")
+    public ResponseEntity<MerchantSummaryResponse> getMerchantSummary(@PathVariable String merchantId){
+        MerchantSummaryResponse summary = paymentService.getMerchantSummary(merchantId);
+
+        return ResponseEntity.ok(summary);
     }
 }
